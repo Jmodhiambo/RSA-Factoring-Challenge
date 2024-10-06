@@ -1,0 +1,25 @@
+#!/usr/bin/python3
+import math
+
+
+def main():
+    try:
+        with open("tests/test00", "r") as file:
+            for i in file:
+                num = int(i)
+                sqrtt = int(math.sqrt(num)) + 1
+
+                for j in range(2, sqrtt + 1):
+                    if num % j == 0:
+                        k = int(num / j)
+                        print(f"{num}={k}*{j}")
+                        break
+    except FileNotFoundError:
+        print("The file was not found")
+
+    except Exception as err:
+        print("Exception: {err}")
+
+
+if __name__ == "__main__":
+    main()
