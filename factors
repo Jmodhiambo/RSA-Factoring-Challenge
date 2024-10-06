@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 """
 Module factors
-This modules factorizes a number to try a decrypt it 
-Fuctions:
+This module factorizes a number to try to decrypt it.
+Functions:
     def main()
 """
 import math
@@ -13,19 +13,18 @@ def main():
     try:
         with open("tests/test00", "r") as file:
             for i in file:
-                num = int(i)
-                sqrtt = int(math.sqrt(num)) + 1
+                num = int(i.strip())  # Remove newline characters
+                sqrtt = math.isqrt(num)  # Directly compute integer square root
 
                 for j in range(2, sqrtt + 1):
                     if num % j == 0:
-                        k = int(num / j)
-                        print(f"{num}={k}*{j}")
+                        k = num // j  # Use integer division
+                        print(f"{num}={j}*{k}")  # Print in the correct format
                         break
     except FileNotFoundError:
-        print("The file was not found")
-
+        print("The file was not found.")
     except Exception as err:
-        print("Exception: {err}")
+        print(f"Exception: {err}")
 
 
 if __name__ == "__main__":
