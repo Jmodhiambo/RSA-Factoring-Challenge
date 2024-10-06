@@ -1,8 +1,15 @@
 #!/usr/bin/python3
+"""
+Module factors
+This modules factorizes a number to try a decrypt it 
+Fuctions:
+    def main()
+"""
 import math
 
 
 def main():
+    """Factorizes a number"""
     try:
         with open("tests/test00", "r") as file:
             for i in file:

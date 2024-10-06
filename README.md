@@ -1,1 +1,1 @@
-This is a readme file for the RSA Factoring Challenge
+This is the readme file for the RSA Factoring Challenge
