@@ -3,10 +3,44 @@
 Module factors
 This module factorizes a number to try to decrypt it.
 Functions:
+    def pollards_rho(n)
     def main()
 """
-import math
 import sys
+import random
+import math
+
+
+def pollards_rho(n):
+    """Uses Pollard's Rho algorithm to find a non-trivial factor of n"""
+    if n % 2 == 0:
+        return 2
+    x = random.randint(2, n-1)
+    y = x
+    c = random.randint(1, n-1)
+    d = 1
+
+    while d == 1:
+        x = (x * x + c) % n
+        y = (y * y + c) % n
+        y = (y * y + c) % n
+        d = math.gcd(abs(x - y), n)
+
+        if d == n:
+            return pollards_rho(n)
+    
+    return d
+
+
+def factorize(num):
+    """Factorizes a given large number using Pollard's Rho"""
+    if num <= 1:
+        return
+    if num % 2 == 0:
+        print(f"{num}=2*{num//2}")
+        return
+    factor = pollards_rho(num)
+    print(f"{num}={factor}*{num // factor}")
 
 
 def main():
@@ -23,27 +57,14 @@ def main():
                 if num_str:  # Ensure the line is not empty
                     try:
                         num = int(num_str)
-                        sqrtt = math.isqrt(num)
-                        factor_found = False
-                        
-                        # Attempt to find factors
-                        for j in range(2, sqrtt + 1):
-                            if num % j == 0:
-                                k = num // j
-                                print(f"{num}={j}*{k}")
-                                factor_found = True
-                                break
-
-                        # If no factors are found, handle it (though this shouldn't be common)
-                        if not factor_found:
-                            print(f"No factors found for {num}")
-
+                        factorize(num)
                     except ValueError:
                         print(f"Invalid number: {num_str}")
     except FileNotFoundError:
         print(f"File {file_name} was not found.")
     except Exception as err:
         print(f"Error: {err}")
+
 
 if __name__ == "__main__":
     main()
