@@ -12,25 +12,38 @@ import sys
 def main():
     """Factorizes a number from a file provided as a command-line argument"""
     if len(sys.argv) != 2:
-        print("Usage: .factors <file>")
+        print("Usage: ./factors <file>")
         sys.exit(1)
 
     try:
         file_name = sys.argv[1]
         with open(file_name, "r") as file:
-            for i in file:
-                num = int(i.strip())  # Remove newline characters
-                sqrtt = math.isqrt(num)  # Directly compute integer square root
+            for line in file:
+                num_str = line.strip()
+                if num_str:  # Ensure the line is not empty
+                    try:
+                        num = int(num_str)
+                        sqrtt = math.isqrt(num)
+                        factor_found = False
+                        
+                        # Attempt to find factors
+                        for j in range(2, sqrtt + 1):
+                            if num % j == 0:
+                                k = num // j
+                                print(f"{num}={j}*{k}")
+                                factor_found = True
+                                break
 
-                for j in range(2, sqrtt + 1):
-                    if num % j == 0:
-                        k = num // j  # Use integer division
-                        print(f"{num}={j}*{k}")  # Print in the correct format
-                        break
+                        # If no factors are found, handle it (though this shouldn't be common)
+                        if not factor_found:
+                            print(f"No factors found for {num}")
+
+                    except ValueError:
+                        print(f"Invalid number: {num_str}")
     except FileNotFoundError:
-        print("The file was not found.")
+        print(f"File {file_name} was not found.")
     except Exception as err:
-        print(f"Exception: {err}")
+        print(f"Error: {err}")
 
 if __name__ == "__main__":
     main()
