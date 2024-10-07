@@ -3,44 +3,77 @@
 Module factors
 This module factorizes a number to try to decrypt it.
 Functions:
-    def pollards_rho(n)
     def main()
 """
-import sys
-import random
 import math
+import sys
+import concurrent.futures
+
+
+def is_prime(n):
+    """Check if a number is prime"""
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+
+def trial_division(n):
+    """Perform trial division for small factors"""
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return i, n // i
+    return None
 
 
 def pollards_rho(n):
-    """Uses Pollard's Rho algorithm to find a non-trivial factor of n"""
+    """Pollard's Rho algorithm for large factors"""
     if n % 2 == 0:
         return 2
-    x = random.randint(2, n-1)
-    y = x
-    c = random.randint(1, n-1)
+    x = 2
+    y = 2
     d = 1
-
+    f = lambda x: (x * x + 1) % n
     while d == 1:
-        x = (x * x + c) % n
-        y = (y * y + c) % n
-        y = (y * y + c) % n
+        x = f(x)
+        y = f(f(y))
         d = math.gcd(abs(x - y), n)
-
-        if d == n:
-            return pollards_rho(n)
-    
+    if d == n:
+        return None
     return d
 
 
-def factorize(num):
-    """Factorizes a given large number using Pollard's Rho"""
-    if num <= 1:
-        return
-    if num % 2 == 0:
-        print(f"{num}=2*{num//2}")
-        return
-    factor = pollards_rho(num)
-    print(f"{num}={factor}*{num // factor}")
+def factorize(n):
+    """Factorizes the number n into two factors"""
+    if is_prime(n):
+        return f"{n} is prime"
+    
+    result = trial_division(n)
+    if result:
+        return result
+    
+    factor = pollards_rho(n)
+    if factor is None:
+        return f"Could not factor {n}"
+    return factor, n // factor
+
+
+def handle_factorization(num):
+    """Handles the factorization and output formatting"""
+    result = factorize(num)
+    if isinstance(result, tuple):
+        factor1, factor2 = result
+        print(f"{num}={factor1}*{factor2}")
+    else:
+        print(result)
 
 
 def main():
@@ -52,18 +85,16 @@ def main():
     try:
         file_name = sys.argv[1]
         with open(file_name, "r") as file:
-            for line in file:
-                num_str = line.strip()
-                if num_str:  # Ensure the line is not empty
-                    try:
-                        num = int(num_str)
-                        factorize(num)
-                    except ValueError:
-                        print(f"Invalid number: {num_str}")
+            numbers = [int(line.strip()) for line in file]
+
+        # Parallelize the factorization process
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(handle_factorization, numbers)
+
     except FileNotFoundError:
-        print(f"File {file_name} was not found.")
+        print("The file was not found.")
     except Exception as err:
-        print(f"Error: {err}")
+        print(f"Exception: {err}")
 
 
 if __name__ == "__main__":
